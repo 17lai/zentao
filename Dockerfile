@@ -1,13 +1,17 @@
-FROM buildpack-deps:20.04-curl 
+FROM buildpack-deps:22.04-curl 
 LABEL maintainer="Swire Chen <idoop@msn.cn>"
-
-ENV ZENTAO_VER=18.9
-ARG ZENTAO_URL=https://www.zentao.net/dl/zentao/${ZENTAO_VER}/ZenTaoPMS-${ZENTAO_VER}-zbox_amd64.tar.gz
 
 #ADD https://raw.githubusercontent.com/easysoft/zentaopms/master/www/upgrade.php.tmp /tmp/upgrade.php
 COPY upgrade.php /tmp/upgrade.php
 
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends iproute2 sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV ZENTAO_VER=21.7
+ARG ZENTAO_URL=https://www.zentao.net/dl/zentao/${ZENTAO_VER}/ZenTaoPMS-${ZENTAO_VER}-zbox_amd64.tar.gz
 
 RUN curl --dns-servers 1.2.4.8 -sSL ${ZENTAO_URL} -o /tmp/zbox.tar.gz \
     && chmod +x /usr/local/bin/docker-entrypoint
